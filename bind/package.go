@@ -200,7 +200,7 @@ func (p *Package) getDoc(parent string, o types.Object) string {
 
 		// if a function returns a type defined in the package,
 		// it is organized under that type
-		if doc == "" && sig.Results().Len() == 1 {
+		if doc == "" && sig.Results().Len() > 0 {
 			ret := sig.Results().At(0).Type()
 			if ntyp, ok := ret.(*types.Named); ok {
 				tn := ntyp.Obj().Name()
@@ -635,10 +635,5 @@ func (p *Package) sortStructEmbeds() {
 }
 
 func shouldIgnore(gdoc string) bool {
-	const ignore = "gopy:ignore"
-	if idx := strings.Index(gdoc, ignore); idx >= 0 {
-		gdoc = gdoc[:idx] + gdoc[idx+len(ignore)+1:]
-		return true
-	}
-	return false
+	return strings.Contains(gdoc, "gopy:ignore")
 }
