@@ -310,6 +310,9 @@ func (p *Package) process() error {
 
 		case *types.Func:
 			fv, err := newFuncFrom(p, "", obj, obj.Type().(*types.Signature))
+			if shouldIgnore(fv.Doc()) {
+				continue
+			}
 			if err != nil {
 				continue
 			}
@@ -320,6 +323,9 @@ func (p *Package) process() error {
 			switch typ := named.Underlying().(type) {
 			case *types.Struct:
 				sv, err := newStruct(p, obj)
+				if shouldIgnore(sv.Doc()) {
+					continue
+				}
 				if err != nil {
 					fmt.Println(err)
 					continue
@@ -334,6 +340,9 @@ func (p *Package) process() error {
 
 			case *types.Interface:
 				iv, err := newInterface(p, obj)
+				if shouldIgnore(iv.Doc()) {
+					continue
+				}
 				if err != nil {
 					fmt.Println(err)
 					continue
@@ -345,6 +354,9 @@ func (p *Package) process() error {
 
 			case *types.Slice:
 				sl, err := newSlice(p, obj)
+				if shouldIgnore(sl.Doc()) {
+					continue
+				}
 				if err != nil {
 					fmt.Println(err)
 					continue
@@ -353,6 +365,9 @@ func (p *Package) process() error {
 
 			case *types.Map:
 				mp, err := newMap(p, obj)
+				if shouldIgnore(mp.Doc()) {
+					continue
+				}
 				if err != nil {
 					fmt.Println(err)
 					continue
@@ -617,4 +632,13 @@ func (p *Package) sortStructEmbeds() {
 		}
 		// fmt.Printf("%s nswap: %v\n", p.pkg.Path(), nswap)
 	}
+}
+
+func shouldIgnore(gdoc string) bool {
+	const ignore = "gopy:ignore"
+	if idx := strings.Index(gdoc, ignore); idx >= 0 {
+		gdoc = gdoc[:idx] + gdoc[idx+len(ignore)+1:]
+		return true
+	}
+	return false
 }
