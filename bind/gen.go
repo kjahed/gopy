@@ -742,6 +742,9 @@ func (g *pyGen) genExtTypesGo() {
 		if _, has := g.pkgmap[sym.gopkg.Path()]; has {
 			continue
 		}
+		if strings.Contains(sym.gopkg.Path(), "/internal/") {
+			continue
+		}
 		g.genType(sym, true, false) // ext types, no python wrapping
 	}
 }
