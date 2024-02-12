@@ -286,10 +286,6 @@ func (p *Package) process() error {
 	maps := make(map[string]*Map)
 
 	scope := p.pkg.Scope()
-	sort.Slice(scope.Names(), func(i, j int) bool {
-		return scope.Names()[i] < scope.Names()[j]
-	})
-
 	for _, name := range scope.Names() {
 		obj := scope.Lookup(name)
 		if !obj.Exported() {
@@ -401,9 +397,16 @@ func (p *Package) process() error {
 		}
 	}
 
+	keys := make([]string, 0, len(structs))
+	for k := range structs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	// remove ctors from funcs.
 	// add methods.
-	for sname, s := range structs {
+	for _, sname := range keys {
+		s := structs[sname]
 		styp := s.GoType()
 		ptyp := types.NewPointer(styp)
 		p.syms.addType(nil, ptyp)
@@ -451,7 +454,14 @@ func (p *Package) process() error {
 		p.addStruct(s)
 	}
 
-	for iname, ifc := range ifaces {
+	keys = make([]string, 0, len(ifaces))
+	for k := range ifaces {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, iname := range keys {
+		ifc := ifaces[iname]
 		mset := types.NewMethodSet(ifc.GoType())
 		for i := 0; i < mset.Len(); i++ {
 			meth := mset.At(i)
@@ -467,7 +477,14 @@ func (p *Package) process() error {
 		p.addInterface(ifc)
 	}
 
-	for sname, s := range slices {
+	keys = make([]string, 0, len(slices))
+	for k := range slices {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, sname := range keys {
+		s := slices[sname]
 		styp := s.GoType()
 		ntyp, ok := styp.(*types.Named)
 		if !ok {
@@ -492,7 +509,14 @@ func (p *Package) process() error {
 		p.addSlice(s)
 	}
 
-	for sname, s := range maps {
+	keys = make([]string, 0, len(maps))
+	for k := range maps {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, sname := range keys {
+		s := maps[sname]
 		styp := s.GoType()
 		ntyp, ok := styp.(*types.Named)
 		if !ok {
@@ -517,8 +541,14 @@ func (p *Package) process() error {
 		p.addMap(s)
 	}
 
-	for _, fct := range funcs {
-		p.addFunc(fct)
+	keys = make([]string, 0, len(funcs))
+	for k := range funcs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		p.addFunc(funcs[k])
 	}
 
 	return err
