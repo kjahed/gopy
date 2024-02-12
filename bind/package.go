@@ -410,7 +410,14 @@ func (p *Package) process() error {
 		styp := s.GoType()
 		ptyp := types.NewPointer(styp)
 		p.syms.addType(nil, ptyp)
-		for name, fct := range funcs {
+
+		keys = make([]string, 0, len(funcs))
+		for k := range funcs {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, name := range keys {
+			fct := funcs[name]
 			if !fct.Obj().Exported() {
 				continue
 			}
