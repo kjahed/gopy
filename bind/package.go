@@ -11,6 +11,7 @@ import (
 	"go/types"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -285,6 +286,10 @@ func (p *Package) process() error {
 	maps := make(map[string]*Map)
 
 	scope := p.pkg.Scope()
+	sort.Slice(scope.Names(), func(i, j int) bool {
+		return scope.Names()[i] < scope.Names()[j]
+	})
+
 	for _, name := range scope.Names() {
 		obj := scope.Lookup(name)
 		if !obj.Exported() {
