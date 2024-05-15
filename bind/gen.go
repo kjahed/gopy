@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -550,7 +551,14 @@ func (g *pyGen) genPkgWrapOut() {
 	g.pywrap.Printf("\n\n")
 	// note: must generate import string at end as imports can be added during processing
 	impstr := ""
+
+	ims := make([]string, 0, len(g.pkg.pyimports))
 	for _, im := range g.pkg.pyimports {
+		ims = append(ims, im)
+	}
+	sort.Strings(ims)
+
+	for _, im := range ims {
 		if g.mode == ModeGen || g.mode == ModeBuild || g.mode == ModePkg {
 			if g.cfg.PkgPrefix != "" {
 				impstr += fmt.Sprintf("from %s import %s\n", g.cfg.PkgPrefix, im)
