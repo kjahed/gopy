@@ -246,7 +246,7 @@ otherwise parameter is a python list that we copy from
 		g.pywrap.Indent()
 		g.pywrap.Printf("if self.index < len(self):\n")
 		g.pywrap.Indent()
-		g.pywrap.Printf("rv = _%s_elem(self.handle, self.index)\n", qNm)
+		g.pywrap.Println("rv = self.__getitem__(self.index)")
 		g.pywrap.Println("self.index = self.index + 1")
 		g.pywrap.Println("return rv")
 		g.pywrap.Outdent()
