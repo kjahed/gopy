@@ -81,7 +81,11 @@ func Embed(stru interface{}, embed reflect.Type) interface{} {
 		return nil
 	}
 	f := typ.Field(0)
-	if f.Type.Kind() == reflect.Struct && f.Anonymous { // anon only avail on StructField fm typ
+	k := f.Type.Kind()
+	if k == reflect.Ptr {
+		k = f.Type.Elem().Kind()
+	}
+	if k == reflect.Struct && f.Anonymous { // anon only avail on StructField fm typ
 		vf := v.Field(0)
 		vfpi := PtrValue(vf).Interface()
 		if f.Type == embed {
