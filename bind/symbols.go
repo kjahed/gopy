@@ -1108,7 +1108,6 @@ func (sym *symtab) addSignatureType(pkg *types.Package, obj types.Object, t type
 		py2g += retstr + "C.PyObject_CallObject(_fun_arg, nil)\n"
 	}
 	py2g += "C.gopy_err_handle()\n"
-	py2g += "C.PyGILState_Release(_gstate)\n"
 	if rets.Len() == 1 {
 		cvt, err := sym.pyObjectToGo(ret.Type(), rsym, "_fcret")
 		if err != nil {
