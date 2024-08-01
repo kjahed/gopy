@@ -1085,14 +1085,15 @@ func (sym *symtab) addSignatureType(pkg *types.Package, obj types.Object, t type
 
 	// TODO: use strings.Builder
 	py2g += "_gstate := C.PyGILState_Ensure()\n"
+	py2g += "defer C.PyGILState_Release(_gstate)\n"
 	if rets.Len() == 0 {
-		py2g += "if C.PyCallable_Check(_fun_arg) == 0 { C.PyGILState_Release(_gstate)\nreturn }\n"
+		py2g += "if C.PyCallable_Check(_fun_arg) == 0 { return }\n"
 	} else {
 		zstr, err := sym.ZeroToGo(ret.Type(), rsym)
 		if err != nil {
 			return err
 		}
-		py2g += fmt.Sprintf("if C.PyCallable_Check(_fun_arg) == 0 { C.PyGILState_Release(_gstate)\nreturn %s }\n", zstr)
+		py2g += fmt.Sprintf("if C.PyCallable_Check(_fun_arg) == 0 { return %s }\n", zstr)
 	}
 	if nargs > 0 {
 		bstr, err := sym.buildTuple(args, "_fcargs", "_fun_arg")
