@@ -317,8 +317,14 @@ func (p *Package) process() error {
 			funcs[name] = fv
 
 		case *types.TypeName:
-			named := obj.Type().(*types.Named)
-			switch typ := named.Underlying().(type) {
+			var underlying types.Type
+			if at, ok := obj.Type().(*types.Alias); ok {
+				underlying = at.Underlying()
+			} else {
+				underlying = obj.Type().(*types.Named).Underlying()
+			}
+
+			switch typ := underlying.(type) {
 			case *types.Struct:
 				sv, err := newStruct(p, obj)
 				if err != nil {
